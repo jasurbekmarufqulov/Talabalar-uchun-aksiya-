@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omadli Student — Pulli Roulette</title>
+    <!-- Telegram WebApp Scriptini ulash (Bu juda muhim!) -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -193,19 +195,28 @@
     <div class="result-popup" id="resultPopup">
         <h2>YUTUQ!</h2>
         <p id="prizeText">Siz yutdingiz: </p>
-        <button class="close-popup-btn" onclick="closePopup()">Hisobga olish</button>
+        <button class="close-popup-btn" id="claimBtn">Hisobga olish va yopish</button>
     </div>
 
     <script>
+        // Telegram WebApp obyektini ochish
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand(); // O'yinni to'liq ekranda ochish
+        }
+
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const spinBtn = document.getElementById('spinBtn');
         const resultPopup = document.getElementById('resultPopup');
         const prizeText = document.getElementById('prizeText');
         const userBalanceTxt = document.getElementById('userBalance');
+        const claimBtn = document.getElementById('claimBtn');
 
         let currentBalance = 0;
         let isFreeAttempt = true; 
+        let lastWonPrize = null;
+        let lastAttemptType = "";
 
         const prizes = [
             { text: "500 So'm", amount: 500, color: "#1abc9c" },
@@ -252,7 +263,8 @@
 
             if (isFreeAttempt) {
                 isFreeAttempt = false; 
-                spinWheel(true);
+                lastAttemptType = "Tekin urinish";
+                spinWheel();
             } else {
                 if (currentBalance < 5000) {
                     alert("Balansingizda mablag' yetarli emas! Kamida 5 000 so'm bo'lishi kerak.");
@@ -260,14 +272,14 @@
                 }
                 currentBalance -= 5000;
                 userBalanceTxt.innerText = currentBalance;
-                spinWheel(false);
+                lastAttemptType = "5000 so'mlik urinish";
+                spinWheel();
             }
         }
 
-        function spinWheel(isFree) {
+        function spinWheel() {
             isSpinning = true;
             spinBtn.disabled = true;
-            
             spinBtn.innerText = "G'ildirak aylanmoqda...";
             spinBtn.style.background = "#7f8c8d";
 
@@ -275,11 +287,11 @@
             const chance = Math.random() * 100;
 
             if (chance < 40) {
-                targetPrizeIndex = 0; // 500 so'm (40% imkoniyat)
+                targetPrizeIndex = 0; 
             } else if (chance < 70) {
-                targetPrizeIndex = 1; // 1000 so'm (30% imkoniyat)
+                targetPrizeIndex = 1; 
             } else {
-                targetPrizeIndex = Math.floor(Math.random() * (numSegments - 2)) + 2; // Boshqa yutuqlar (30% imkoniyat)
+                targetPrizeIndex = Math.floor(Math.random() * (numSegments - 2)) + 2; 
             }
 
             const segmentCenterAngle = (targetPrizeIndex * (360 / numSegments)) + (360 / numSegments / 2);
@@ -294,46 +306,33 @@
                 isSpinning = false;
                 spinBtn.disabled = false;
                 
-                const wonPrize = prizes[targetPrizeIndex];
-                
-                currentBalance += wonPrize.amount;
+                lastWonPrize = prizes[targetPrizeIndex];
+                currentBalance += lastWonPrize.amount;
                 userBalanceTxt.innerText = currentBalance;
 
-                prizeText.innerText = `💵 ${wonPrize.text} 💵\n\nBalansingiz yangilandi!`;
+                prizeText.innerText = `💵 ${lastWonPrize.text} 💵\n\nBalansingiz yangilandi!`;
                 resultPopup.classList.add('active');
                 
-                // --- TELEGRAM INTEGRATSIYASI ---
-                const tg = window.Telegram.WebApp;
-                const userId = tg.initDataUnsafe?.user?.id || "Noma'lum ID";
-                const userName = tg.initDataUnsafe?.user?.username || "Noma'lum_User";
-
-                // Ma'lumotlaringiz xavfsiz o'rnatildi:
-                const BOT_TOKEN = "8689394977:AAFo5XmFsNPEQ--8QclWoQlB4ErXhRoFeJ8";
-                const ADMIN_ID = "2002084215"; 
-                
-                const typeText = isFree ? "Tekin urinish" : "5000 so'mlik urinish";
-                const xabarMatni = `🔔 **Omadli Student — Yangi Yutuq!**\n\n👤 Talaba: @${userName}\n🆔 ID: ${userId}\n🕹 Turi: ${typeText}\n💰 Yutgan puli: ${wonPrize.text}\n💳 Jami balansi: ${currentBalance} so'm`;
-                
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: ADMIN_ID,
-                        text: xabarMatni,
-                        parse_mode: "Markdown"
-                    })
-                });
-
                 spinBtn.innerText = "G'ildirakni aylantirish (5 000 So'm)";
                 spinBtn.style.background = "#e67e22"; 
             }, 4500);
         }
 
-        function closePopup() {
+        // "Hisobga olish" tugmasi bosilganda ma'lumotni botga yuborish
+        claimBtn.onclick = function() {
             resultPopup.classList.remove('active');
-        }
+            
+            if (tg && lastWonPrize) {
+                // Ma'lumotlarni server.js o'qiy oladigan formatda yuborish
+                const dataString = `${lastWonPrize.text}|${lastAttemptType}|${currentBalance}`;
+                tg.sendData(dataString); // Botga ma'lumot ketadi
+                tg.close(); // WebApp avtomatik yopiladi
+            } else {
+                alert("Telegram muhiti topilmadi yoki yutuq aniqlanmadi.");
+            }
+        };
 
         drawWheel();
     </script>
 </body>
-</html>
+    </html>
