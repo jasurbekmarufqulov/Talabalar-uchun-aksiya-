@@ -1,8 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
 
-const token = '8689394977:AAFo5XmFsNPEQ--8QclWoQlB4ErXhRoFeJ8';
-const bot = new TelegramBot(token, {polling: true});
+// BotFather bergan yangi xavfsiz token qo'yildi
+const token = '8689394977:AAHVMFiY4yJl6d8EGB0wJpU6rBgB_Fxwenc';
 const ADMIN_ID = '2002084215';
 
 http.createServer((req, res) => {
@@ -10,7 +10,7 @@ http.createServer((req, res) => {
     res.end();
 }).listen(process.env.PORT || 3000);
 
-console.log("Aksiya bot tizimi ishga tushdi...");
+console.log("Aksiya bot tizimi yangi token bilan ishga tushdi...");
 
 bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id, "👋 Salom! 'Omadli Talaba' rasmiy homiylik aksiyasiga xush kelibsiz!\n\nBu yerda siz har kuni mutlaqo bepul yoki kafolatlangan aksiyalar orqali bonuslar olishingiz mumkin. Boshlash uchun tugmani bosing: 👇", {
@@ -29,10 +29,10 @@ bot.on('web_app_data', (msg) => {
         const userName = msg.from.username ? `@${msg.from.username}` : "Noma'lum";
         const userId = msg.from.id;
 
-        // O'yinchiga rag'batlantiruvchi xabar
+        // O'yinchiga xabar
         bot.sendMessage(userId, `🎉 Muvaffaqiyatli! Homiylarimiz tomonidan sizga ${prize} aksiya bonusi taqdim etildi.\n💳 Sizning umumiy jamg'armangiz: ${balance} so'm.`);
 
-        // Adminga sof marketing hisoboti
+        // Adminga aksiya hisoboti
         const adminXabar = `📈 **Yangi Aksiya Hisoboti**\n\n👤 Foydalanuvchi: ${userName}\n🆔 ID: ${userId}\n📋 Ishtirok turi: ${type}\n💰 Ajratilgan bonus: ${prize}\n💳 Jami balansi: ${balance} so'm`;
         bot.sendMessage(ADMIN_ID, adminXabar, { parse_mode: 'Markdown' });
         
