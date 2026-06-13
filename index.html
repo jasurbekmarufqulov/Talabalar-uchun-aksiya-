@@ -168,14 +168,14 @@
     <script>
         // Telegram WebApp yuklanishi
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Oynani to'liq ekranga ochish
+        tg.expand();
 
         let hasSpun = false;
         let selectedPrize = "";
         let finalBalance = 0;
 
-        // Tasodifiy yutuqlar ro'yxati (So'm birligida)
-        const prizes = ["20,000", "50,000", "100,000", "15,000", "200,000", "30,000", "75,000", "150,000"];
+        // YUTUQLAR SIZ SO'RAGANDEK 1000 SO'MDAN 10000 SO'MGACNA MOSLANDI
+        const prizes = ["1,000", "3,000", "5,000", "2,000", "10,000", "4,000", "6,000", "8,000"];
 
         function startSpin() {
             if (hasSpun) return;
@@ -184,20 +184,17 @@
             document.getElementById('spinBtn').disabled = true;
 
             const wheel = document.getElementById('wheel');
-            // Tasodifiy aylanish darajasi (Kamida 5 marta to'liq aylanadi)
             const randomDegree = Math.floor(Math.random() * 360) + 1800; 
             wheel.style.transform = `rotate(${randomDegree}deg)`;
 
-            // Sektor burchagini hisoblash va yutuqni aniqlash
             const actualDegrees = randomDegree % 360;
             const sectorIndex = Math.floor((360 - actualDegrees) / 45) % 8;
             
             selectedPrize = prizes[sectorIndex];
             
-            // Taxminiy jami hisob (foydalanuvchi hisobiga qo'shilganini ko'rsatish)
-            finalBalance = parseInt(selectedPrize.replace(/,/g, '')) + 50000; 
+            // Foydalanuvchining umumiy balansi (Yutuq + asosiy bonus hisobi)
+            finalBalance = parseInt(selectedPrize.replace(/,/g, '')) + 10000; 
 
-            // G'ildirak to'xtagandan keyin natijani ko'rsatish
             setTimeout(() => {
                 document.getElementById('prizeText').innerText = `🎉 Tabriklaymiz! Sizga ${selectedPrize} so'm aksiya bonusi ajratildi!`;
                 document.getElementById('resultBox').style.display = 'block';
@@ -205,10 +202,7 @@
         }
 
         function sendResultToBot() {
-            // Backend kodi ajratib olishi uchun formatlangan ma'lumot string shaklida
             const dataString = `${selectedPrize} so'm|Rasmiy Aksiya|${finalBalance.toLocaleString('uz-UZ')}`;
-            
-            // Telegram botga ma'lumotni xavfsiz jo'natish va oynani yopish
             tg.sendData(dataString);
             tg.close();
         }
