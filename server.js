@@ -1,17 +1,22 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
 
-// BotFather bergan yangi xavfsiz token qo'yildi
+// Bot tokeni va Admin ID
 const token = '8689394977:AAHVMFiY4yJl6d8EGB0wJpU6rBgB_Fxwenc';
 const ADMIN_ID = '2002084215';
 
+// MASALAN SHU YERDA BOTNI YARATISH QATORI ETISHMAYOTGAN EDI (TUZATILDI):
+const bot = new TelegramBot(token, { polling: true });
+
+// Render o'chib qolmasligi uchun kichik veb-server
 http.createServer((req, res) => {
     res.write("Bot marketing tizimi aktiv!");
     res.end();
 }).listen(process.env.PORT || 3000);
 
-console.log("Aksiya bot tizimi yangi token bilan ishga tushdi...");
+console.log("Aksiya bot tizimi yangi token bilan muvaffaqiyatli ishga tushdi...");
 
+// /start buyrug'i kelganda
 bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id, "👋 Salom! 'Omadli Talaba' rasmiy homiylik aksiyasiga xush kelibsiz!\n\nBu yerda siz har kuni mutlaqo bepul yoki kafolatlangan aksiyalar orqali bonuslar olishingiz mumkin. Boshlash uchun tugmani bosing: 👇", {
         reply_markup: {
@@ -22,6 +27,7 @@ bot.onText(/\/start/, (msg) => {
     });
 });
 
+// WebApp'dan ma'lumot kelganda
 bot.on('web_app_data', (msg) => {
     try {
         const data = msg.web_app_data.data; 
