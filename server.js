@@ -1,24 +1,23 @@
 const TelegramBot = require('node-telegram-bot-api');
 const http = require('http');
 
-// Bot tokeni va Admin ID
-const token = '8689394977:AAHVMFiY4yJl6d8EGB0wJpU6rBgB_Fxwenc';
+// Yangi taqdim etilgan xavfsiz token va sizning Admin ID raqamingiz
+const token = '8947184537:AAHJr2rVEQ_lfvSY8Ixh5dzUNkOTvRvaO5E';
 const ADMIN_ID = '2002084215';
 
-// MASALAN SHU YERDA BOTNI YARATISH QATORI ETISHMAYOTGAN EDI (TUZATILDI):
 const bot = new TelegramBot(token, { polling: true });
 
-// Render o'chib qolmasligi uchun kichik veb-server
+// Render o'chib qolmasligi uchun veb-server porti
 http.createServer((req, res) => {
-    res.write("Bot marketing tizimi aktiv!");
+    res.write("Aksiya marketing platformasi faol holatda!");
     res.end();
 }).listen(process.env.PORT || 3000);
 
-console.log("Aksiya bot tizimi yangi token bilan muvaffaqiyatli ishga tushdi...");
+console.log("Bot tizimi muvaffaqiyatli ishga tushdi...");
 
-// /start buyrug'i kelganda
+// /start buyrug'i kelganda aksiya tugmasini chiqarish
 bot.onText(/\/start/, (msg) => {
-    bot.sendMessage(msg.chat.id, "👋 Salom! 'Omadli Talaba' rasmiy homiylik aksiyasiga xush kelibsiz!\n\nBu yerda siz har kuni mutlaqo bepul yoki kafolatlangan aksiyalar orqali bonuslar olishingiz mumkin. Boshlash uchun tugmani bosing: 👇", {
+    bot.sendMessage(msg.chat.id, "👋 Salom! 'Omadli Talaba' rasmiy aksiyasiga xush kelibsiz!\n\nAksiyamizda ishtirok etish va kafolatlangan bonuslarga ega bo'lish uchun quyidagi tugmani bosing: 👇", {
         reply_markup: {
             inline_keyboard: [[
                 { text: "🎁 Aksiya stendini ochish", web_app: { url: "https://jasurbekmarufqulov.github.io/Talabalar-uchun-aksiya-/" } }
@@ -27,22 +26,30 @@ bot.onText(/\/start/, (msg) => {
     });
 });
 
-// WebApp'dan ma'lumot kelganda
+// O'yin tugab, Telegram WebApp ma'lumot yuborganida
 bot.on('web_app_data', (msg) => {
     try {
         const data = msg.web_app_data.data; 
         const [prize, type, balance] = data.split('|');
         const userName = msg.from.username ? `@${msg.from.username}` : "Noma'lum";
         const userId = msg.from.id;
+        const fullName = `${msg.from.first_name || ''} ${msg.from.last_name || ''}`.trim() || "Ism kiritilmagan";
 
-        // O'yinchiga xabar
-        bot.sendMessage(userId, `🎉 Muvaffaqiyatli! Homiylarimiz tomonidan sizga ${prize} aksiya bonusi taqdim etildi.\n💳 Sizning umumiy jamg'armangiz: ${balance} so'm.`);
+        // Ishtirokchining o'ziga yutuq xabari
+        bot.sendMessage(userId, `🎉 Tabriklaymiz!\nAksiya doirasida sizga ${prize} bonus taqdim etildi.\n\n💳 Sizning joriy balansingiz: ${balance} so'm.`);
 
-        // Adminga aksiya hisoboti
-        const adminXabar = `📈 **Yangi Aksiya Hisoboti**\n\n👤 Foydalanuvchi: ${userName}\n🆔 ID: ${userId}\n📋 Ishtirok turi: ${type}\n💰 Ajratilgan bonus: ${prize}\n💳 Jami balansi: ${balance} so'm`;
+        // Adminga (Sizga) toliq marketing hisoboti
+        const adminXabar = `📈 **YANGI AKSIYA ISHTIROKCHISI**\n\n` +
+                           `👤 Foydalanuvchi: ${fullName} (${userName})\n` +
+                           `🆔 Telegram ID: \`${userId}\`\n` +
+                           `📋 Ishtirok turi: ${type}\n` +
+                           `💰 Berilgan bonus: ${prize}\n` +
+                           `💳 Umumiy balansi: ${balance} so'm\n` +
+                           `📅 Vaqti: ${new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' })}`;
+                           
         bot.sendMessage(ADMIN_ID, adminXabar, { parse_mode: 'Markdown' });
         
     } catch (error) {
-        console.error("Xatolik yuz berdi:", error);
+        console.error("Ma'lumotni qayta ishlashda xatolik:", error);
     }
 });
