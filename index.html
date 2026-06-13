@@ -3,325 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omadli Talaba — Kunlik Kafolatlangan Aksiya</title>
+    <title>Omadli Talaba Aksiya</title>
+    <!-- Telegram WebApp Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1c29 0%, #2c2f48 100%);
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
-            padding: 20px;
+            min-height: 100vh;
+            text-align: center;
             overflow-x: hidden;
         }
 
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
+        }
+
         h1 {
-            font-size: 26px;
+            font-size: 24px;
             margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-align: center;
-            color: #f1c40f;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .subtitle {
-            font-size: 13px;
-            opacity: 0.9;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 500;
-            color: #bdc3c7;
-        }
-
-        .balance-card {
-            background: rgba(46, 204, 113, 0.15);
-            padding: 10px 25px;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 14px;
+            color: #e0e0e0;
             margin-bottom: 25px;
-            border: 1px solid #2ecc71;
-            color: #2ecc71;
         }
 
-        .roulette-container {
+        /* Ruletka g'ildiragi dizayni */
+        .wheel-outer {
             position: relative;
-            width: 320px;
-            height: 320px;
-            margin-bottom: 35px;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto 30px auto;
         }
 
-        .pointer {
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #ffd700;
+            background: conic-gradient(
+                #ff4757 0deg 45deg, #2ed573 45deg 90deg,
+                #1e90ff 90deg 135deg, #ffa500 135deg 180deg,
+                #9b59b6 180deg 225deg, #1abc9c 225deg 270deg,
+                #f1c40f 270deg 315deg, #e74c3c 315deg 360deg
+            );
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), inset 0 0 15px rgba(0,0,0,0.5);
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+
+        /* Ruletka ko'rsatkichi (Arrow) */
+        .arrow {
             position: absolute;
-            top: -12px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-top: 28px solid #e74c3c;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ffd700;
             z-index: 10;
-        }
-
-        #wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 8px rgba(241, 196, 15, 0.3);
-            transition: transform 4.5s cubic-bezier(0.15, 0.85, 0.35, 1.02);
-        }
-
-        .center-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 55px;
-            height: 55px;
-            background: #f1c40f;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid white;
-        }
-        .center-circle::after {
-            content: '🎁';
-            font-size: 22px;
-        }
-
-        .buttons-area {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
 
         .spin-btn {
-            background: #3498db;
-            color: white;
-        }
-        .spin-btn:hover { background: #2980b9; }
-        .spin-btn:disabled {
-            background: #7f8c8d;
-            cursor: not-allowed;
-            box-shadow: none;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            border: none;
+            color: #1e3c72;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
         }
 
-        .result-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: #ffffff;
-            color: #2c3e50;
-            padding: 25px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-            z-index: 100;
-            width: 85%;
-            max-width: 300px;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .spin-btn:disabled {
+            background: #cccccc;
+            color: #666666;
+            box-shadow: none;
+            cursor: not-allowed;
         }
-        .result-popup.active {
-            transform: translate(-50%, -50%) scale(1);
+
+        .spin-btn:not(:disabled):active {
+            transform: scale(0.97);
         }
-        .result-popup h2 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: #2ecc71;
+
+        /* Natija ekrani */
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
         }
-        .result-popup p {
-            font-size: 17px;
-            margin-bottom: 20px;
+
+        .prize-text {
+            font-size: 20px;
             font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 15px;
         }
-        .close-popup-btn {
-            background: #2c3e50;
+
+        .claim-btn {
+            background: linear-gradient(45deg, #2ed573, #26af5f);
+            border: none;
             color: white;
-            padding: 10px 25px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
-    <h1>Omadli Talaba</h1>
-    <div class="subtitle">Homiylar hisobidan kafolatlangan aksiya standi</div>
-    
-    <div class="balance-card">Sizning balansingiz: <span id="userBalance">0</span> so'm</div>
+    <div class="container">
+        <h1>Omadli Talaba</h1>
+        <div class="subtitle">Rasmiy homiylik aksiyasi</div>
 
-    <div class="roulette-container">
-        <div class="pointer"></div>
-        <div class="center-circle"></div>
-        <canvas id="wheel" width="300" height="300"></canvas>
-    </div>
+        <div class="wheel-outer">
+            <div class="arrow"></div>
+            <div id="wheel" class="wheel"></div>
+        </div>
 
-    <div class="buttons-area">
-        <button class="spin-btn" id="spinBtn" onclick="handleSpin()">Aylantirish (Bugungi kunlik tekin imkoniyat)</button>
-    </div>
+        <button id="spinBtn" class="spin-btn" onclick="startSpin()">Aylantirish</button>
 
-    <div class="result-popup" id="resultPopup">
-        <h2>AKSIYA BONUSI!</h2>
-        <p id="prizeText">Sizga taqdim etildi: </p>
-        <button class="close-popup-btn" id="claimBtn">Yutuqni hisobga olish</button>
+        <div id="resultBox" class="result-box">
+            <div id="prizeText" class="prize-text"></div>
+            <button class="claim-btn" onclick="sendResultToBot()">Yutuqni hisobga olish</button>
+        </div>
     </div>
 
     <script>
-        const tg = window.Telegram?.WebApp;
-        if (tg) tg.expand();
+        // Telegram WebApp yuklanishi
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Oynani to'liq ekranga ochish
 
-        const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-        const resultPopup = document.getElementById('resultPopup');
-        const prizeText = document.getElementById('prizeText');
-        const userBalanceTxt = document.getElementById('userBalance');
-        const claimBtn = document.getElementById('claimBtn');
+        let hasSpun = false;
+        let selectedPrize = "";
+        let finalBalance = 0;
 
-        let currentBalance = 0;
-        let isFreeAttempt = true; 
-        let lastWonPrize = null;
-        let lastAttemptType = "";
+        // Tasodifiy yutuqlar ro'yxati (So'm birligida)
+        const prizes = ["20,000", "50,000", "100,000", "15,000", "200,000", "30,000", "75,000", "150,000"];
 
-        // Qimor alomatlarini yo'qotish uchun yutuqlar miqdori qayta shakllantirildi
-        const prizes = [
-            { text: "500 So'm", amount: 500, color: "#1abc9c" },
-            { text: "1 000 So'm", amount: 1000, color: "#34495e" },
-            { text: "2 000 So'm", amount: 2000, color: "#2980b9" },
-            { text: "2 500 So'm", amount: 2500, color: "#27ae60" },
-            { text: "3 000 So'm", amount: 3000, color: "#f39c12" },
-            { text: "3 500 So'm", amount: 3500, color: "#8e44ad" },
-            { text: "4 000 So'm", amount: 4000, color: "#2c3e50" }, 
-            { text: "5 000 So'm", amount: 5000, color: "#d35400" }
-        ];
-
-        const numSegments = prizes.length;
-        const segmentAngle = (2 * Math.PI) / numSegments;
-        let currentRotation = 0;
-        let isSpinning = false;
-
-        function drawWheel() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < numSegments; i++) {
-                const angle = i * segmentAngle;
-                ctx.beginPath();
-                ctx.fillStyle = prizes[i].color;
-                ctx.moveTo(150, 150);
-                ctx.arc(150, 150, 150, angle, angle + segmentAngle);
-                ctx.lineTo(150, 150);
-                ctx.fill();
-                
-                ctx.save();
-                ctx.translate(150, 150);
-                ctx.rotate(angle + segmentAngle / 2);
-                ctx.fillStyle = "white";
-                ctx.font = "bold 12px sans-serif"; 
-                ctx.textAlign = "right";
-                ctx.fillText(prizes[i].text, 135, 4);
-                ctx.restore();
-            }
-        }
-
-        function handleSpin() {
-            if (isSpinning) return;
-
-            if (isFreeAttempt) {
-                isFreeAttempt = false; 
-                lastAttemptType = "Kunlik tekin aksiya";
-                spinWheel(true);
-            } else {
-                if (currentBalance < 2000) {
-                    alert("Balansingizda mablag' yetarli emas! Qo'shimcha aksiya stendi uchun kamida 2 000 so'm bo'lishi kerak.");
-                    return;
-                }
-                currentBalance -= 2000;
-                userBalanceTxt.innerText = currentBalance;
-                lastAttemptType = "Kafolatlangan 2000s urinish";
-                spinWheel(false);
-            }
-        }
-
-        function spinWheel(isFree) {
-            isSpinning = true;
-            spinBtn.disabled = true;
-            spinBtn.innerText = "Aksiya stendi aylanmoqda...";
-
-            let targetPrizeIndex;
+        function startSpin() {
+            if (hasSpun) return;
+            hasSpun = true;
             
-            if (isFree) {
-                // Tekin urinishda 500 so'mdan 2500 so'mgacha tasodifiy chiqadi
-                targetPrizeIndex = Math.floor(Math.random() * 4); 
-            } else {
-                // Pullik (2000 so'mlik) urinishda odam HEEEECH QACHON yutqazmaydi!
-                // Eng kam yutuq 2000 so'm (o'z puli qaytadi), yoki undan ko'p (2500, 3000, 5000) chiqadi.
-                const paidPrizes = [2, 3, 4, 5, 7]; // Kamida 2000 so'mlik indekslar
-                targetPrizeIndex = paidPrizes[Math.floor(Math.random() * paidPrizes.length)];
-            }
+            document.getElementById('spinBtn').disabled = true;
 
-            const segmentCenterAngle = (targetPrizeIndex * (360 / numSegments)) + (360 / numSegments / 2);
-            const stopDegrees = (360 - segmentCenterAngle + 270) % 360;
-            const totalSpinAngle = (6 * 360) + stopDegrees;
-            currentRotation += totalSpinAngle;
+            const wheel = document.getElementById('wheel');
+            // Tasodifiy aylanish darajasi (Kamida 5 marta to'liq aylanadi)
+            const randomDegree = Math.floor(Math.random() * 360) + 1800; 
+            wheel.style.transform = `rotate(${randomDegree}deg)`;
+
+            // Sektor burchagini hisoblash va yutuqni aniqlash
+            const actualDegrees = randomDegree % 360;
+            const sectorIndex = Math.floor((360 - actualDegrees) / 45) % 8;
             
-            canvas.style.transform = `rotate(${currentRotation}deg)`;
+            selectedPrize = prizes[sectorIndex];
             
+            // Taxminiy jami hisob (foydalanuvchi hisobiga qo'shilganini ko'rsatish)
+            finalBalance = parseInt(selectedPrize.replace(/,/g, '')) + 50000; 
+
+            // G'ildirak to'xtagandan keyin natijani ko'rsatish
             setTimeout(() => {
-                isSpinning = false;
-                spinBtn.disabled = false;
-                
-                lastWonPrize = prizes[targetPrizeIndex];
-                currentBalance += lastWonPrize.amount;
-                userBalanceTxt.innerText = currentBalance;
-
-                prizeText.innerText = `🎁 ${lastWonPrize.text} 🎁\n\nMablag' balansingizga kafolatli qo'shildi.`;
-                resultPopup.classList.add('active');
-                
-                spinBtn.innerText = "Yana aylantirish (Kafolatlangan 2 000 So'm)";
-                spinBtn.style.background = "#2ecc71"; 
-            }, 4500);
+                document.getElementById('prizeText').innerText = `🎉 Tabriklaymiz! Sizga ${selectedPrize} so'm aksiya bonusi ajratildi!`;
+                document.getElementById('resultBox').style.display = 'block';
+            }, 4000);
         }
 
-        claimBtn.onclick = function() {
-            resultPopup.classList.remove('active');
-            if (tg && lastWonPrize) {
-                const dataString = `${lastWonPrize.text}|${lastAttemptType}|${currentBalance}`;
-                tg.sendData(dataString);
-                tg.close();
-            } else {
-                alert("Telegram interfeysi aniqlanmadi.");
-            }
-        };
-
-        drawWheel();
+        function sendResultToBot() {
+            // Backend kodi ajratib olishi uchun formatlangan ma'lumot string shaklida
+            const dataString = `${selectedPrize} so'm|Rasmiy Aksiya|${finalBalance.toLocaleString('uz-UZ')}`;
+            
+            // Telegram botga ma'lumotni xavfsiz jo'natish va oynani yopish
+            tg.sendData(dataString);
+            tg.close();
+        }
     </script>
 </body>
-    </html>
+</html>
