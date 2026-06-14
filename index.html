@@ -32,21 +32,86 @@
             border-radius: 12px;
             background: rgba(0, 255, 170, 0.05);
         }
-        .wheel-placeholder {
-            width: 220px;
-            height: 220px;
+        
+        /* 🎡 REAL PULLIK BARABAN DIZAYNI */
+        .wheel-wrapper {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 30px auto;
+        }
+        /* Tepasidagi ko'rsatkich strelka */
+        .arrow {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #ffcc00;
+            z-index: 10;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             border: 8px solid #ffcc00;
-            margin: 25px auto;
+            position: relative;
+            overflow: hidden;
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.3, 1);
+            background: #110d26;
+            box-shadow: 0 0 25px rgba(255, 51, 102, 0.4);
+        }
+        /* Sektorlar va ularning ichidagi matnlarni to'g'rilash */
+        .sector {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            right: 0;
+            transform-origin: 0% 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            background: radial-gradient(circle, #ff3366, #110022);
-            transition: transform 3s cubic-bezier(0.1, 0.8, 0.3, 1);
-            box-shadow: 0 0 20px #ff3366;
         }
+        .sector span {
+            position: absolute;
+            transform: rotate(30deg) translate(35px, -35px);
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            text-shadow: 1px 1px 3px black;
+        }
+        /* Sektorlarni aylanma burchak bo'yicha bo'yash */
+        .sec-1 { transform: rotate(0deg) skewY(-30deg); background-color: #ff3366; }
+        .sec-2 { transform: rotate(60deg) skewY(-30deg); background-color: #7928ca; }
+        .sec-3 { transform: rotate(120deg) skewY(-30deg); background-color: #0072ff; }
+        .sec-4 { transform: rotate(180deg) skewY(-30deg); background-color: #28a745; }
+        .sec-5 { transform: rotate(240deg) skewY(-30deg); background-color: #ffaa00; }
+        .sec-6 { transform: rotate(300deg) skewY(-30deg); background-color: #e4a11b; }
+
+        /* Markazdagi kichik tugmacha */
+        .center-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 0 10px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
         button {
             width: 100%;
             padding: 14px;
@@ -58,22 +123,11 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-spin-regular {
-            background: linear-gradient(to right, #00c6ff, #0072ff);
-            color: white;
-        }
-        .btn-spin-premium {
-            background: linear-gradient(to right, #f12711, #f5af19);
-            color: white;
-        }
-        .btn-ref {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-withdraw {
-            background-color: #e4a11b;
-            color: black;
-        }
+        .btn-spin-regular { background: linear-gradient(to right, #00c6ff, #0072ff); color: white; }
+        .btn-spin-premium { background: linear-gradient(to right, #f12711, #f5af19); color: white; }
+        .btn-ref { background-color: #28a745; color: white; }
+        .btn-withdraw { background-color: #e4a11b; color: black; }
+        
         input {
             width: 90%;
             padding: 12px;
@@ -96,13 +150,21 @@
         Hisobingiz: <span id="balans_matni">0 so'm</span>
     </div>
 
-    <div class="wheel-placeholder" id="baraban_gildiragi">
-        💰 SPIN
+    <div class="wheel-wrapper">
+        <div class="arrow"></div>
+        <div class="center-pin">SPIN</div>
+        <div class="wheel" id="baraban_gildiragi">
+            <div class="sector sec-1"><span>500</span></div>
+            <div class="sector sec-2"><span>1000</span></div>
+            <div class="sector sec-3"><span>2000</span></div>
+            <div class="sector sec-4"><span>3000</span></div>
+            <div class="sector sec-5"><span>5000</span></div>
+            <div class="sector sec-6"><span>10000</span></div>
+        </div>
     </div>
 
     <button class="btn-spin-regular" onclick="barabanniAylantir('regular')">⚡️ Oddiy Aylantirish (-500 so'm)</button>
     <button class="btn-spin-premium" onclick="barabanniAylantir('premium')">👑 Premium Aylantirish (-5000 so'm)</button>
-    
     <button class="btn-ref" onclick="do'stniTaklifQilish()">👥 Do'stni chaqirish (+500 so'm)</button>
 
     <div style="margin-top: 25px; border-top: 2px solid #2d264f; padding-top: 15px;">
@@ -121,8 +183,8 @@
     let joriyBalans = 0;
     let userId = tg.initDataUnsafe?.user?.id || 7777777; 
     let username = tg.initDataUnsafe?.user?.first_name || "O'yinchi";
+    let isSpinning = false; // Ketma-ket bosib tashlashni oldini olish
 
-    // Sahifa ochilganda bazadagi haqiqiy balansni tekshirish
     fetch(`${SERVER_URL}/get-user?id=${userId}`)
         .then(res => res.json())
         .then(data => {
@@ -132,55 +194,63 @@
             }
         });
 
-    // PULLIK AYLANTIRISH MANTIQI
     function barabanniAylantir(rejim) {
+        if(isSpinning) return; // Agar baraban aylanayotgan bo'lsa, to'xtatish
+
         if (rejim === 'regular') {
             if (joriyBalans >= 500) {
-                joriyBalans -= 500; // Balansdan srazu 500 so'm yechish
+                joriyBalans -= 500;
                 omadniSinash('regular');
             } else {
-                alert("Hisobingizda mablag' yetarli emas! Kamida 500 so'm kerak. Do'stlarni taklif qilib pul ishlang.");
+                alert("Hisobingizda mablag' yetarli emas!");
             }
         } 
         else if (rejim === 'premium') {
             if (joriyBalans >= 5000) {
-                joriyBalans -= 5000; // Balansdan srazu 5000 so'm yechish
+                joriyBalans -= 5000;
                 omadniSinash('premium');
             } else {
-                alert("Premium rejim uchun hisobingizda kamida 5000 so'm bo'lishi kerak!");
+                alert("Premium rejim uchun pul yetarli emas!");
             }
         }
         document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
     }
 
-    // Barabanning aylanish vizual effekti va yutuqlar algoritmi
     function omadniSinash(rejim) {
+        isSpinning = true;
         let gildirak = document.getElementById("baraban_gildiragi");
-        let randomDeg = Math.floor(Math.random() * 360) + 1800; // 5 marta to'liq aylanish
+        
+        // 5 marta to'liq aylanib, tasodifiy burchakda to'xtash
+        let randomDeg = Math.floor(Math.random() * 360) + 1800; 
         gildirak.style.transform = `rotate(${randomDeg}deg)`;
 
         setTimeout(() => {
             let yutuq = 0;
 
             if (rejim === 'regular') {
-                // 500 so'mlik rejim yutuqlari (Omadga qarab foyda yoki zarar)
-                let yutuqlarXonasi = [0, 100, 300, 500, 1000, 1500, 2500];
+                // 500 so'mdan 10 000 so'mgacha yutuqlar xonasi (va 0 ya'ni yutqaziq)
+                let yutuqlarXonasi = [0, 500, 1000, 2000, 3000, 5000, 10000];
                 yutuq = yutuqlarXonasi[Math.floor(Math.random() * yutuqlarXonasi.length)];
-                alert(`🎰 Oddiy baraban! Sizga ${yutuq} so'm yutuq chiqdi!`);
+                
+                if(yutuq > 0) {
+                    alert(`🎰 Omad! Sizga ${yutuq} so'm yutuq chiqdi!`);
+                } else {
+                    alert(`😢 Bu safar omad kelmadi. Yana urinib ko'ring!`);
+                }
             } 
             else if (rejim === 'premium') {
-                // 5000 so'mlik rejim yutuqlari (Katta pullar)
-                let premiumYutuqlar = [0, 1000, 3000, 5000, 7000, 15000, 30000];
+                // Premiumda yutqaziq deyarli yo'q, katta summalar chiqadi
+                let premiumYutuqlar = [500, 2000, 5000, 5000, 10000, 10000];
                 yutuq = premiumYutuqlar[Math.floor(Math.random() * premiumYutuqlar.length)];
-                alert(`👑 Premium baraban! Sizga ${yutuq} so'm katta yutuq chiqdi!`);
+                alert(`👑 Premium! Sizga ${yutuq} so'm chiqdi!`);
             }
 
-            joriyBalans += yutuq; // Yutuqni balansga qo'shish
+            joriyBalans += yutuq; 
             document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
             
-            // Serverda ham balansni srazu xavfsiz yangilash
             balansniServerdaYangila(joriyBalans);
-        }, 3000);
+            isSpinning = false;
+        }, 4000); // 4 soniya aylanish vaqti
     }
 
     function balansniServerdaYangila(yangiBalans) {
@@ -191,7 +261,6 @@
         });
     }
 
-    // REFERAL LINKI GENERATSIYASI
     function do'stniTaklifQilish() {
         let botUsername = "SizningBarabanBot"; 
         let text = "Do'stim, pullik barabanni aylantirib omadingni sina, haqiqiy pul yut! 🎁";
@@ -200,16 +269,15 @@
         tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
     }
 
-    // ADMINGA KARTA RAQAMINI YUBORISH
     function sendWithdrawRequest() {
         let cardNum = document.getElementById("cardInput").value;
 
         if (cardNum.length < 16) {
-            alert("Karta raqami noto'g'ri! 16 ta raqam bo'lishi lozim.");
+            alert("Karta raqami noto'g'ri!");
             return;
         }
         if (joriyBalans <= 0) {
-            alert("Yechish uchun balansingizda pul yo'q!");
+            alert("Balansda pul yo'q!");
             return;
         }
 
@@ -221,11 +289,9 @@
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                alert("Arizangiz adminga jo'natildi! Hisobingiz arizadagi summaga yangilandi.");
+                alert("Arizangiz adminga jo'natildi!");
                 joriyBalans = 0;
                 document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
-            } else {
-                alert("Xatolik: Ariza rad etildi.");
             }
         });
     }
