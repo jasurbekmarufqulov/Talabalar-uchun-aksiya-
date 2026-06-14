@@ -1,116 +1,38 @@
-const express = require('express');
-const cors = require('cors');
-const app = express();
+// Barabanning aylanish vizual effekti va yangi yutuqlar algoritmi
+function omadniSinash(rejim) {
+    let gildirak = document.getElementById("baraban_gildiragi");
+    let randomDeg = Math.floor(Math.random() * 360) + 1800; // 5 marta to'liq aylanish effekti
+    gildirak.style.transform = `rotate(${randomDeg}deg)`;
 
-app.use(cors());
-app.use(express.json());
+    // Baraban 3 soniya aylanadi, keyin yutuq hisoblanadi
+    setTimeout(() => {
+        let yutuq = 0;
 
-// 💾 TEST UCHUN BAZA (Asl loyihada MongoDB bo'lishi tavsiya etiladi)
-// Telefon xotirasini tejash uchun vaqtinchalik xotira obyekti
-let usersDatabase = {};
-
-// 1. FOYDALANUVCHI MA'LUMOTLARINI OLISH
-app.get('/get-user', (req, res) => {
-    const { id } = req.query;
-    if (!usersDatabase[id]) {
-        usersDatabase[id] = { balance: 0, name: "Yangi foydalanuvchi" };
-    }
-    res.json(usersDatabase[id]);
-});
-
-// 2. BALANS YANGILASH (XAVFSIZLIK TEKSHIRUVI BILAN)
-app.post('/update-balance', (req, res) => {
-    const { id, name, balance } = req.body;
-    
-    // Server bazasidagi eski ma'lumotni yangilash
-    if (!usersDatabase[id]) {
-        usersDatabase[id] = { balance: balance, name: name };
-    } else {
-        usersDatabase[id].balance = balance;
-        usersDatabase[id].name = name;
-    }
-    res.json({ success: true });
-});
-
-// 3. TELEGRAM BOT WEBHOOK (REFERAL TIZIMINI JAVASCRIPTDA HISOBALASH)
-app.post('/telegram-webhook', async (req, res) => {
-    const { message } = req.body;
-    
-    if (message && message.text) {
-        const chatId = message.chat.id; // Botga yangi kirgan do'stning IDsi
-        const text = message.text;      // Yuborilgan matn (/start r_JasurbekID)
-
-        // Agar foydalanuvchi referal link orqali kirgan bo'lsa
-        if (text.startsWith('/start r_')) {
-            const inviterId = text.split('r_')[1]; // Taklif qilgan odamning IDsini ajratish
-
-            // O'zini o'zi taklif qilmaganligini va yangi foydalanuvchiligini tekshirish
-            if (chatId.toString() !== inviterId.toString()) {
-                
-                // Taklif qilgan odam bazada bormi? Yo'q bo'lsa ochamiz
-                if (!usersDatabase[inviterId]) {
-                    usersDatabase[inviterId] = { balance: 500, name: "Admin" };
-                } else {
-                    usersDatabase[inviterId].balance += 500; // Hisobiga 500 so'm qo'shish
-                }
-
-                // Taklif qilgan odamga bot orqali xushxabar yuborish
-                await sendTelegramNotification(inviterId, "🎉 Do'stingiz taklifingizni qabul qildi! Hisobingizga +500 so'm qo'shildi! 🎁");
+        if (rejim === 'regular') {
+            // 🎰 500 so'mlik rejim: 500 so'mdan 10 000 so'mgacha tasodifiy yutuqlar
+            // O'yin qiziq bo'lishi uchun 0 (yutqaziq) ham qo'shilgan
+            let yutuqlarXonasi = [0, 500, 1000, 2000, 3000, 5000, 10000];
+            yutuq = yutuqlarXonasi[Math.floor(Math.random() * yutuqlarXonasi.length)];
+            
+            if (yutuq > 0) {
+                alert(`🎰 Oddiy baraban! Omadingiz keldi, sizga ${yutuq} so'm yutuq chiqdi!`);
+            } else {
+                alert(`😢 Bu safar omadingiz kelmadi! Keyingi aylantirishda albatta omad kulib boqadi.`);
             }
+        } 
+        else if (rejim === 'premium') {
+            // 👑 5000 so'mlik rejim: Bunda 500 so'm chiqish ehtimoli juda kam, 
+            // asosan eng yuqori yutuqlar (5000 va 10000) chiqish imkoniyati yuqori bo'ladi
+            let premiumYutuqlar = [500, 2000, 5000, 5000, 10000, 10000, 10000];
+            yutuq = premiumYutuqlar[Math.floor(Math.random() * premiumYutuqlar.length)];
+            alert(`👑 Premium baraban! Katta yutuqlar zonasi: sizga ${yutuq} so'm chiqdi!`);
         }
-    }
-    res.sendStatus(200);
-});
 
-// 4. KARTA RAQAMINI VA PUL YECHISH ARIZASINI ADMINGA YUBORISH
-app.post('/withdraw', async (req, res) => {
-    const { id, name, card, summa } = req.body;
-
-    // Xavfsizlik tekshiruvi: Haqiqatdan ham bazada shuncha puli bormi?
-    if (!usersDatabase[id] || usersDatabase[id].balance < summa || summa <= 0) {
-        return res.json({ success: false, message: "Tizimni aldash taqiqlanadi!" });
-    }
-
-    // Adminga boradigan ariza formati
-    const adminXabari = `📩 **YANGI PUL YECHISH ARIZASI**\n\n` +
-                        `👤 Ismi: ${name}\n` +
-                        `🆔 Telegram ID: ${id}\n` +
-                        `💳 Karta raqami: \`${card}\`\n` +
-                        `💰 Yechiladigan summa: ${summa} so'm`;
-
-    const adminChatId = "YOUR_PERSONAL_TELEGRAM_ID"; // O'zingizning shaxsiy Telegram ID raqamingizni yozing
-
-    // Adminga xabar jo'natish
-    const yuborildi = await sendTelegramNotification(adminChatId, adminXabari);
-    
-    if (yuborildi) {
-        usersDatabase[id].balance = 0; // Arizadan keyin uning balansini 0 qilamiz
-        res.json({ success: true });
-    } else {
-        res.json({ success: false });
-    }
-});
-
-// TELEGRAM API ORQALI XABAR YUBORUVChI YORDAMCHI FUNKSIYA
-async function sendTelegramNotification(chatId, text) {
-    const botToken = process.env.BOT_TOKEN; // Render sozlamalaridan yashirin olingan token
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-    
-    try {
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: "Markdown" })
-        });
-        return true;
-    } catch (err) {
-        console.log("Telegram xabar yuborishda xatolik:", err);
-        return false;
-    }
+        // Yangi yutuqni joriy balansga qo'shish
+        joriyBalans += yutuq; 
+        document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
+        
+        // Serverdagi bazaga yangi balansni xavfsiz yuborish
+        balansniServerdaYangila(joriyBalans);
+    }, 3000); // 3 soniyadan keyin baraban to'xtaydi
 }
-
-// SERVER PORTINI ISHGA TUSHIRISH
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server ${PORT}-portda muvaffaqiyatli ishlamoqda...`);
-});
