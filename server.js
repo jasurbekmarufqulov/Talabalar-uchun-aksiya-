@@ -47,3 +47,15 @@ async function sendTelegramMessage(chatId, text) {
         body: JSON.stringify({ chat_id: chatId, text: text })
     });
         }
+// index.html ichidagi JavaScript
+function taklifQilish() {
+    // Foydalanuvchining shaxsiy Telegram ID sini olamiz
+    let userId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    let botUsername = "SizningBarabanBot"; // O'zingizning botingiz userneymi
+    
+    let text = "Do'stim, ajoyib baraban o'yinini o'yna va pul yutib ol! 🎁";
+    let link = `https://t.me/${botUsername}?start=r_${userId}`;
+    
+    // Telegram ulashish (Share) oynasini ochadi
+    window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+}
