@@ -1,1 +1,16 @@
-
+{
+  "name": "omadli-talaba-bot",
+  "version": "1.0.0",
+  "description": "Talabalar uchun aksiya bot backend tizimi",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-telegram-bot-api": "^0.66.0"
+  },
+  "engines": {
+    "node": "24.14.1"
+  }
+}
