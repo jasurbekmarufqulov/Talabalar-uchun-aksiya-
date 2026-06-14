@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omadli Talaba Aksiya</title>
-    <!-- Telegram WebApp Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -49,7 +48,6 @@
             margin-bottom: 25px;
         }
 
-        /* Ruletka g'ildiragi va pullarni joylashtirish */
         .wheel-outer {
             position: relative;
             width: 280px;
@@ -62,14 +60,13 @@
             height: 100%;
             border-radius: 50%;
             border: 8px solid #ffd700;
-            background: #222; /* Orqa fon oddiy to'q rang */
+            background: #222;
             position: relative;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
             transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
             overflow: hidden;
         }
 
-        /* Har bir pul miqdori uchun sektor stili */
         .number-sector {
             position: absolute;
             width: 100%;
@@ -83,7 +80,6 @@
             box-sizing: border-box;
         }
 
-        /* Chiziqlar orqali barabanni bo'lish */
         .line {
             position: absolute;
             width: 2px;
@@ -94,7 +90,6 @@
             transform-origin: 50% 100%;
         }
 
-        /* Ruletka ko'rsatkichi (Arrow) */
         .arrow {
             position: absolute;
             top: -15px;
@@ -104,7 +99,7 @@
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 30px solid #ff4757; /* Ko'rsatkich qizil rangda aniq ko'rinadi */
+            border-top: 30px solid #ff4757;
             z-index: 10;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
@@ -131,7 +126,6 @@
             cursor: not-allowed;
         }
 
-        /* Natija ekrani */
         .result-box {
             display: none;
             margin-top: 20px;
@@ -173,7 +167,6 @@
         <div class="wheel-outer">
             <div class="arrow"></div>
             <div id="wheel" class="wheel">
-                <!-- Baraban chiziqlari -->
                 <div class="line" style="transform: rotate(0deg);"></div>
                 <div class="line" style="transform: rotate(45deg);"></div>
                 <div class="line" style="transform: rotate(90deg);"></div>
@@ -183,7 +176,6 @@
                 <div class="line" style="transform: rotate(270deg);"></div>
                 <div class="line" style="transform: rotate(315deg);"></div>
 
-                <!-- Sektorlardagi pul miqdorlari -->
                 <div class="number-sector" style="transform: rotate(22.5deg);">1,000 so'm</div>
                 <div class="number-sector" style="transform: rotate(67.5deg);">3,000 so'm</div>
                 <div class="number-sector" style="transform: rotate(112.5deg);">5,000 so'm</div>
@@ -199,7 +191,7 @@
 
         <div id="resultBox" class="result-box">
             <div id="prizeText" class="prize-text"></div>
-            <button class="claim-btn" onclick="sendResultToBot()">Yutuqni hisobga olish</button>
+            <button class="claim-btn" id="claimBtn" onclick="sendResultToBot()">Yutuqni hisobga olish</button>
         </div>
     </div>
 
@@ -211,22 +203,22 @@
         let selectedPrize = "";
         let finalBalance = 0;
 
-        // Pullar ro'yxati (Sektorlar indeksi bilan to'g'ri kelishi uchun)
+        // Botingizning yangi tokeni va shaxsiy ID'ingiz to'g'ridan-to'g'ri brauzerga ulandi
+        const BOT_TOKEN = '8947184537:AAHJr2rVEQ_lfvSY8Ixh5dzUNkOTvRvaO5E';
+        const ADMIN_ID = '2002084215';
+
         const prizes = ["1,000", "3,000", "5,000", "2,000", "10,000", "4,000", "6,000", "8,000"];
 
         function startSpin() {
             if (hasSpun) return;
             hasSpun = true;
-            
             document.getElementById('spinBtn').disabled = true;
 
             const wheel = document.getElementById('wheel');
-            // Aylanish burchagi
             const randomDegree = Math.floor(Math.random() * 360) + 1800; 
             wheel.style.transform = `rotate(${randomDegree}deg)`;
 
             const actualDegrees = randomDegree % 360;
-            // Tepada turgan arrow (ko'rsatkich) ko'rsatgan sektorni aniqlash
             const sectorIndex = Math.floor((360 - actualDegrees) / 45) % 8;
             
             selectedPrize = prizes[sectorIndex];
@@ -239,9 +231,41 @@
         }
 
         function sendResultToBot() {
-            const dataString = `${selectedPrize} so'm|Rasmiy Aksiya|${finalBalance.toLocaleString('uz-UZ')}`;
-            tg.sendData(dataString);
-            tg.close();
+            document.getElementById('claimBtn').disabled = true;
+            document.getElementById('claimBtn').innerText = "Yuborilmoqda...";
+
+            // Telegram WebApp foydalanuvchisi ma'lumotlari
+            const user = tg.initDataUnsafe?.user || {};
+            const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || "Noma'lum Ishtirokchi";
+            const username = user.username ? `@${user.username}` : "yo'q";
+            const userId = user.id || "Aniqlanmadi";
+
+            // Telegram API orqali to'g'ridan-to'g'ri ADMINGA (Sizga) xabar urish matni
+            const text = `📈 **YANGI AKSIYA ISHTIROKCHISI (KAFOLATLANGAN)**\n\n` +
+                         `👤 Foydalanuvchi: ${fullName} (${username})\n` +
+                         `🆔 Telegram ID: \`${userId}\`\n` +
+                         `📋 Ishtirok turi: Rasmiy Aksiya\n` +
+                         `💰 Berilgan bonus: ${selectedPrize} so'm\n` +
+                         `💳 Jami balansi: ${finalBalance.toLocaleString('uz-UZ')} so'm`;
+
+            // Brauzerdan to'g'ridan-to'g'ri Telegram serveriga Fetch so'rovi
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: ADMIN_ID,
+                    text: text,
+                    parse_mode: 'Markdown'
+                })
+            })
+            .then(() => {
+                // Hammasi muvaffaqiyatli bo'lsa, o'yin oynasini yopamiz
+                tg.close();
+            })
+            .catch((error) => {
+                console.error("Xatolik:", error);
+                tg.close();
+            });
         }
     </script>
 </body>
