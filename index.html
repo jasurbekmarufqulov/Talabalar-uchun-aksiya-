@@ -12,7 +12,7 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: #ffffff;
             margin: 0;
-            padding: 0;
+            padding: 20px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -23,12 +23,12 @@
         }
 
         .container {
-            width: 90%;
+            width: 95%;
             max-width: 400px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 30px 20px;
+            padding: 25px 20px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-sizing: border-box;
@@ -46,7 +46,21 @@
         .subtitle {
             font-size: 14px;
             color: #e0e0e0;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+        }
+
+        /* Hisob qutisi */
+        .balance-box {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ffaa;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px dashed #00ffaa;
+            display: inline-block;
+            min-width: 180px;
         }
 
         /* Ruletka g'ildiragi va pullarni joylashtirish */
@@ -54,7 +68,7 @@
             position: relative;
             width: 280px;
             height: 280px;
-            margin: 0 auto 30px auto;
+            margin: 0 auto 25px auto;
         }
 
         .wheel {
@@ -62,7 +76,7 @@
             height: 100%;
             border-radius: 50%;
             border: 8px solid #ffd700;
-            background: #222; /* Orqa fon oddiy to'q rang */
+            background: #222;
             position: relative;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
             transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
@@ -79,7 +93,7 @@
             font-size: 14px;
             color: #ffd700;
             transform-origin: 50% 50%;
-            padding-top: 15px;
+            padding-top: 20px;
             box-sizing: border-box;
         }
 
@@ -88,7 +102,7 @@
             position: absolute;
             width: 2px;
             height: 50%;
-            background: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.35);
             left: 50%;
             top: 0;
             transform-origin: 50% 100%;
@@ -104,58 +118,99 @@
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 30px solid #ff4757; /* Ko'rsatkich qizil rangda aniq ko'rinadi */
+            border-top: 30px solid #ff4757;
             z-index: 10;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
 
+        /* Tugmalar stili */
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+            box-sizing: border-box;
+        }
+        button:active { transform: scale(0.97); }
+
         .spin-btn {
             background: linear-gradient(45deg, #ffd700, #ffaa00);
-            border: none;
             color: #1e3c72;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-            transition: all 0.3s ease;
-            width: 100%;
-            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
 
-        .spin-btn:disabled {
-            background: #cccccc;
-            color: #666666;
-            box-shadow: none;
+        .premium-btn {
+            background: linear-gradient(45deg, #ff4757, #ff6b81);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        .ref-btn {
+            background: linear-gradient(45deg, #2ed573, #26af5f);
+            color: white;
+            box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
+        }
+
+        .withdraw-btn {
+            background: linear-gradient(45deg, #e4a11b, #ffcc00);
+            color: black;
+        }
+
+        button:disabled {
+            background: #cccccc !important;
+            color: #666666 !important;
+            box-shadow: none !important;
             cursor: not-allowed;
+        }
+
+        /* Karta kiritish bo'limi */
+        .card-box {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        .card-box h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            box-sizing: border-box;
+            letter-spacing: 1px;
         }
 
         /* Natija ekrani */
         .result-box {
             display: none;
             margin-top: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
             animation: fadeIn 0.5s ease;
         }
 
         .prize-text {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #ffd700;
-            margin-bottom: 15px;
-        }
-
-        .claim-btn {
-            background: linear-gradient(45deg, #2ed573, #26af5f);
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
+            margin-bottom: 5px;
         }
 
         @keyframes fadeIn {
@@ -170,6 +225,11 @@
         <h1>Omadli Talaba</h1>
         <div class="subtitle">Rasmiy homiylik aksiyasi</div>
 
+        <!-- Balans ko'rsatkichi -->
+        <div class="balance-box">
+            Balans: <span id="balans_matni">0 so'm</span>
+        </div>
+
         <div class="wheel-outer">
             <div class="arrow"></div>
             <div id="wheel" class="wheel">
@@ -183,7 +243,7 @@
                 <div class="line" style="transform: rotate(270deg);"></div>
                 <div class="line" style="transform: rotate(315deg);"></div>
 
-                <!-- Sektorlardagi pul miqdorlari -->
+                <!-- Sektorlardagi pul miqdorlari (Siz bergan tartibda) -->
                 <div class="number-sector" style="transform: rotate(22.5deg);">1,000 so'm</div>
                 <div class="number-sector" style="transform: rotate(67.5deg);">3,000 so'm</div>
                 <div class="number-sector" style="transform: rotate(112.5deg);">5,000 so'm</div>
@@ -195,11 +255,21 @@
             </div>
         </div>
 
-        <button id="spinBtn" class="spin-btn" onclick="startSpin()">Aylantirish</button>
+        <!-- Tugmalar -->
+        <button id="spinBtn" class="spin-btn" onclick="startSpin('regular')">⚡️ Oddiy Aylantirish (-500 so'm)</button>
+        <button id="premiumBtn" class="premium-btn" onclick="startSpin('premium')">👑 Premium Aylantirish (-5000 so'm)</button>
+        <button class="ref-btn" onclick="do'stniTaklifQilish()">👥 Do'stni chaqirish (+500 so'm)</button>
 
+        <!-- Natija xabari -->
         <div id="resultBox" class="result-box">
             <div id="prizeText" class="prize-text"></div>
-            <button class="claim-btn" onclick="sendResultToBot()">Yutuqni hisobga olish</button>
+        </div>
+
+        <!-- Karta raqami va Pul yechish -->
+        <div class="card-box">
+            <h3>💳 Karta raqami orqali yechish</h3>
+            <input type="number" id="cardInput" placeholder="8600 0000 0000 0000">
+            <button class="withdraw-btn" onclick="sendResultToBot()">📩 Yechib olish arizasini yuborish</button>
         </div>
     </div>
 
@@ -207,40 +277,109 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let hasSpun = false;
+        let joriyBalans = 0; // Boshlang'ich balans
+        let isSpinning = false;
         let selectedPrize = "";
-        let finalBalance = 0;
 
-        // Pullar ro'yxati (Sektorlar indeksi bilan to'g'ri kelishi uchun)
+        // Sektor tartibi bo'yicha yutuqlar massivi
         const prizes = ["1,000", "3,000", "5,000", "2,000", "10,000", "4,000", "6,000", "8,000"];
 
-        function startSpin() {
-            if (hasSpun) return;
-            hasSpun = true;
-            
+        // Birinchi marta ekranga balansni chiqarish
+        document.getElementById('balans_matni').innerText = joriyBalans.toLocaleString('uz-UZ') + " so'm";
+
+        function startSpin(rejim) {
+            if (isSpinning) return;
+
+            // Pul yetishini tekshirish
+            if (rejim === 'regular') {
+                if (joriyBalans < 500) {
+                    alert("Hisobingizda mablag' yetarli emas (Kamida 500 so'm kerak)!");
+                    return;
+                }
+                joriyBalans -= 500;
+            } else if (rejim === 'premium') {
+                if (joriyBalans < 5000) {
+                    alert("Premium rejim uchun balansda kamida 5000 so'm bo'lishi kerak!");
+                    return;
+                }
+                joriyBalans -= 5000;
+            }
+
+            isSpinning = true;
             document.getElementById('spinBtn').disabled = true;
+            document.getElementById('premiumBtn').disabled = true;
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('balans_matni').innerText = joriyBalans.toLocaleString('uz-UZ') + " so'm";
 
             const wheel = document.getElementById('wheel');
-            // Aylanish burchagi
-            const randomDegree = Math.floor(Math.random() * 360) + 1800; 
+            
+            // Tasodifiy aylanish burchagi algoritmiz
+            const randomDegree = Math.floor(Math.random() * 360) + 2160; // 6 marta to'liq aylanish effekti
             wheel.style.transform = `rotate(${randomDegree}deg)`;
 
+            // To'xtagan joyni hisoblash
             const actualDegrees = randomDegree % 360;
-            // Tepada turgan arrow (ko'rsatkich) ko'rsatgan sektorni aniqlash
             const sectorIndex = Math.floor((360 - actualDegrees) / 45) % 8;
             
             selectedPrize = prizes[sectorIndex];
-            finalBalance = parseInt(selectedPrize.replace(/,/g, '')) + 10000; 
+            let yutuqSummasi = parseInt(selectedPrize.replace(/,/g, ''));
+
+            // Agar Premium rejim bo'lsa yutuqni 2 baravar oshirish (yoki o'zingiz hohlagan bonusni qo'shish)
+            if (rejim === 'premium') {
+                yutuqSummasi = yutuqSummasi * 2; 
+                selectedPrize = yutuqSummasi.toLocaleString('uz-UZ');
+            }
 
             setTimeout(() => {
-                document.getElementById('prizeText').innerText = `🎉 Tabriklaymiz! Sizga ${selectedPrize} so'm aksiya bonusi ajratildi!`;
+                // Balansni yangilash
+                joriyBalans += yutuqSummasi;
+                document.getElementById('balans_matni').innerText = joriyBalans.toLocaleString('uz-UZ') + " so'm";
+                
+                document.getElementById('prizeText').innerText = `🎉 Tabriklaymiz! Sizga ${selectedPrize} so'm yutuq qo'shildi!`;
                 document.getElementById('resultBox').style.display = 'block';
+                
+                // Tugmalarni faollashtirish
+                isSpinning = false;
+                document.getElementById('spinBtn').disabled = false;
+                document.getElementById('premiumBtn').disabled = false;
             }, 4000);
         }
 
+        // 👥 REFERAL TIZIMI: Botga do'stni taklif qilish havolasi
+        function do'stniTaklifQilish() {
+            let botUsername = "SizningAksiyaBot"; // Bu yerga botingiz usernamesini yozing
+            let userId = tg.initDataUnsafe?.user?.id || "777777";
+            let text = "Do'stim, Omadli Talaba aksiyasida qatnashib, naqd pul yutuqlariga ega bo'l! 🎁";
+            let link = `https://t.me/${botUsername}?start=r_${userId}`;
+            
+            // Do'stni chaqirganda foydalanuvchiga rag'bat sifatida +500 so'm berish
+            joriyBalans += 500;
+            document.getElementById('balans_matni').innerText = joriyBalans.toLocaleString('uz-UZ') + " so'm";
+            
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
+        }
+
+        // 📩 YETCHIB OLISH ARIZASINI BOTGA YUBORISH
         function sendResultToBot() {
-            const dataString = `${selectedPrize} so'm|Rasmiy Aksiya|${finalBalance.toLocaleString('uz-UZ')}`;
+            const cardNum = document.getElementById("cardInput").value;
+
+            if (cardNum.length < 16) {
+                alert("Karta raqami noto'g'ri! 16 ta raqam bo'lishi shart.");
+                return;
+            }
+            if (joriyBalans <= 0) {
+                alert("Balansda yechib olish uchun pul yo'q!");
+                return;
+            }
+
+            // Ma'lumotlarni string shaklida botga jo'natish
+            const dataString = `Yechish|Karta: ${cardNum}|Summa: ${joriyBalans.toLocaleString('uz-UZ')} so'm`;
             tg.sendData(dataString);
+            
+            // Yuborilgandan so'ng balansni nollash
+            joriyBalans = 0;
+            document.getElementById('balans_matni').innerText = "0 so'm";
+            alert("Arizangiz adminga muvaffaqiyatli yuborildi!");
             tg.close();
         }
     </script>
