@@ -152,16 +152,6 @@
             box-shadow: 0 4px 10px rgba(46, 213, 115, 0.3);
         }
 
-        /* Cheklov ekrani stili */
-        .limit-box {
-            display: none;
-            padding: 20px;
-            background: rgba(255, 71, 87, 0.2);
-            border: 1px solid #ff4757;
-            border-radius: 15px;
-            margin-top: 20px;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -174,48 +164,34 @@
         <h1>Omadli Talaba</h1>
         <div class="subtitle">Rasmiy homiylik aksiyasi</div>
 
-        <!-- Oddiy rejim: Baraban ekrani -->
-        <div id="gameArea">
-            <div class="wheel-outer">
-                <div class="arrow"></div>
-                <div id="wheel" class="wheel">
-                    <div class="line" style="transform: rotate(0deg);"></div>
-                    <div class="line" style="transform: rotate(45deg);"></div>
-                    <div class="line" style="transform: rotate(90deg);"></div>
-                    <div class="line" style="transform: rotate(135deg);"></div>
-                    <div class="line" style="transform: rotate(180deg);"></div>
-                    <div class="line" style="transform: rotate(225deg);"></div>
-                    <div class="line" style="transform: rotate(270deg);"></div>
-                    <div class="line" style="transform: rotate(315deg);"></div>
+        <div class="wheel-outer">
+            <div class="arrow"></div>
+            <div id="wheel" class="wheel">
+                <div class="line" style="transform: rotate(0deg);"></div>
+                <div class="line" style="transform: rotate(45deg);"></div>
+                <div class="line" style="transform: rotate(90deg);"></div>
+                <div class="line" style="transform: rotate(135deg);"></div>
+                <div class="line" style="transform: rotate(180deg);"></div>
+                <div class="line" style="transform: rotate(225deg);"></div>
+                <div class="line" style="transform: rotate(270deg);"></div>
+                <div class="line" style="transform: rotate(315deg);"></div>
 
-                    <div class="number-sector" style="transform: rotate(22.5deg);">1,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(67.5deg);">3,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(112.5deg);">5,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(157.5deg);">2,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(202.5deg);">10,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(247.5deg);">4,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(292.5deg);">6,000 so'm</div>
-                    <div class="number-sector" style="transform: rotate(337.5deg);">8,000 so'm</div>
-                </div>
-            </div>
-
-            <button id="spinBtn" class="spin-btn" onclick="startSpin()">Aylantirish</button>
-
-            <div id="resultBox" class="result-box">
-                <div id="prizeText" class="prize-text"></div>
-                <button class="claim-btn" id="claimBtn" onclick="sendResultToBot()">Yutuqni hisobga olish</button>
+                <div class="number-sector" style="transform: rotate(22.5deg);">1,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(67.5deg);">3,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(112.5deg);">5,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(157.5deg);">2,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(202.5deg);">10,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(247.5deg);">4,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(292.5deg);">6,000 so'm</div>
+                <div class="number-sector" style="transform: rotate(337.5deg);">8,000 so'm</div>
             </div>
         </div>
 
-        <!-- Cheklov rejimi: Taqiq ekrani -->
-        <div id="limitBox" class="limit-box">
-            <span style="font-size: 40px;">⚠️</span>
-            <h3 style="color: #ff4757; margin-top: 10px;">Imkoniyat tugadi!</h3>
-            <p style="font-size: 14px; color: #e0e0e0; line-height: 1.5;">
-                Siz bugungi aksiya doirasida barabanni aylantirib bo'ldingiz.<br>
-                Yangi imkoniyatlar va aksiyalarni o'tkazib yubormaslik uchun rasmiy botimizni kuzatib boring.
-            </p>
-            <div style="margin-top: 15px; font-size: 15px; color: #ffd700; font-weight: bold;" id="walletInfo"></div>
+        <button id="spinBtn" class="spin-btn" onclick="startSpin()">Aylantirish</button>
+
+        <div id="resultBox" class="result-box">
+            <div id="prizeText" class="prize-text"></div>
+            <button class="claim-btn" id="claimBtn" onclick="sendResultToBot()">Yutuqni hisobga olish</button>
         </div>
     </div>
 
@@ -225,24 +201,14 @@
 
         let hasSpun = false;
         let selectedPrize = "";
+        
+        // FOYDALANUVCHINING ESKI BALANSINI XOTIRADAN O'QISH (AGAR BO'LMASA 0 DAN BOSHLANADI)
         let currentWallet = parseInt(localStorage.getItem('user_wallet')) || 0;
 
         const BOT_TOKEN = '8947184537:AAHJr2rVEQ_lfvSY8Ixh5dzUNkOTvRvaO5E';
         const ADMIN_ID = '2002084215';
+
         const prizes = ["1,000", "3,000", "5,000", "2,000", "10,000", "4,000", "6,000", "8,000"];
-
-        // SAHIFE YUKLANISHI BILANOQ FOYDALANUVCHINING AVVAL O'YNAGAN-O'YNAMAGANINI TEKSHIRISH
-        window.onload = function() {
-            const lastSpinDate = localStorage.getItem('last_spin_date');
-            const todayStr = new Date().toDateString(); // Faqat bugungi kun sanasi (masalan: "Sun Jun 14 2026")
-
-            if (lastSpinDate === todayStr) {
-                // Agar bugun o'ynagan bo'lsa, o'yin maydonini yashirib, cheklovni ko'rsatamiz
-                document.getElementById('gameArea').style.display = 'none';
-                document.getElementById('limitBox').style.display = 'block';
-                document.getElementById('walletInfo').innerText = `💳 Sizning joriy balansingiz: ${currentWallet.toLocaleString('uz-UZ')} so'm`;
-            }
-        };
 
         function startSpin() {
             if (hasSpun) return;
@@ -258,9 +224,11 @@
             
             selectedPrize = prizes[sectorIndex];
             
+            // YUTUQLARNI BIR-BIRIGA QO'SHISH TIZIMI:
             const prizeNumber = parseInt(selectedPrize.replace(/,/g, ''));
-            currentWallet += prizeNumber; 
+            currentWallet += prizeNumber; // Eski balansga yangi yutuq qo'shildi
             
+            // Yangi jami balansni telefon xotirasida saqlab qo'yamiz
             localStorage.setItem('user_wallet', currentWallet);
 
             setTimeout(() => {
@@ -273,10 +241,6 @@
             document.getElementById('claimBtn').disabled = true;
             document.getElementById('claimBtn').innerText = "Yuborilmoqda...";
 
-            // BUGUNGI SANANI TELEFON XOTIRASIGA MUHRLAB QO'YISH
-            const todayStr = new Date().toDateString();
-            localStorage.setItem('last_spin_date', todayStr);
-
             const user = tg.initDataUnsafe?.user || {};
             const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || "Noma'lum Ishtirokchi";
             const username = user.username ? `@${user.username}` : "yo'q";
@@ -285,7 +249,7 @@
             const text = `📈 **YANGI AKSIYA ISHTIROKCHISI**\n\n` +
                          `👤 Foydalanuvchi: ${fullName} (${username})\n` +
                          `🆔 Telegram ID: \`${userId}\`\n` +
-                         `📋 Ishtirok turi: Kunlik cheklovli ishtirok\n` +
+                         `📋 Ishtirok turi: Ketma-ket ishtirok\n` +
                          `💰 Oxirgi yutuq: ${selectedPrize} so'm\n` +
                          `💳 JAMI YIG'ILGAN BALANSI: ${currentWallet.toLocaleString('uz-UZ')} so'm`;
 
