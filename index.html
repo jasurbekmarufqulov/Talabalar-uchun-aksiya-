@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omadli Baraban</title>
+    <title>Pullik Omadli Baraban</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #1a1a2e;
+            background-color: #0f0c1b;
             color: white;
             text-align: center;
             padding: 20px;
@@ -17,46 +17,53 @@
         .container {
             max-width: 400px;
             margin: auto;
-            background: #161625;
+            background: #1d1932;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
         }
         .balance-box {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
-            color: #00ffc6;
+            color: #00ffaa;
             margin-bottom: 20px;
-            border: 2px dashed #00ffc6;
-            padding: 10px;
-            border-radius: 10px;
+            border: 2px dashed #00ffaa;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(0, 255, 170, 0.05);
         }
         .wheel-placeholder {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
-            border: 10px solid #ff007f;
-            margin: 30px auto;
+            border: 8px solid #ffcc00;
+            margin: 25px auto;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            background: radial-gradient(circle, #ff007f, #7928ca);
+            font-size: 20px;
+            background: radial-gradient(circle, #ff3366, #110022);
             transition: transform 3s cubic-bezier(0.1, 0.8, 0.3, 1);
+            box-shadow: 0 0 20px #ff3366;
         }
         button {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             font-size: 16px;
             font-weight: bold;
             border: none;
-            border-radius: 8px;
-            margin-top: 10px;
+            border-radius: 10px;
+            margin-top: 12px;
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-spin {
-            background: linear-gradient(to right, #ff007f, #7928ca);
+        .btn-spin-regular {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+        }
+        .btn-spin-premium {
+            background: linear-gradient(to right, #f12711, #f5af19);
             color: white;
         }
         .btn-ref {
@@ -64,15 +71,17 @@
             color: white;
         }
         .btn-withdraw {
-            background-color: #007bff;
-            color: white;
+            background-color: #e4a11b;
+            color: black;
         }
         input {
             width: 90%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            border-radius: 8px;
+            border: 2px solid #3d356b;
+            background-color: #110d26;
+            color: white;
             font-size: 16px;
             text-align: center;
         }
@@ -81,40 +90,39 @@
 <body>
 
 <div class="container">
-    <h2>🎡 Omadli Baraban</h2>
+    <h2>🎰 Pullik Baraban V2</h2>
     
     <div class="balance-box">
-        Balans: <span id="balans_matni">0 so'm</span>
+        Hisobingiz: <span id="balans_matni">0 so'm</span>
     </div>
 
     <div class="wheel-placeholder" id="baraban_gildiragi">
-        🎯 OMAD
+        💰 SPIN
     </div>
 
-    <button class="btn-spin" onclick="barabanniAylantir()">🎡 Barabanni Aylantirish</button>
-    <button class="btn-ref" onclick="do'stniTaklifQilish()">👥 Do'stni taklif qilish (+500 so'm)</button>
+    <button class="btn-spin-regular" onclick="barabanniAylantir('regular')">⚡️ Oddiy Aylantirish (-500 so'm)</button>
+    <button class="btn-spin-premium" onclick="barabanniAylantir('premium')">👑 Premium Aylantirish (-5000 so'm)</button>
+    
+    <button class="btn-ref" onclick="do'stniTaklifQilish()">👥 Do'stni chaqirish (+500 so'm)</button>
 
-    <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-        <h3>💰 Pul yechish (Karta)</h3>
+    <div style="margin-top: 25px; border-top: 2px solid #2d264f; padding-top: 15px;">
+        <h3>💳 Pulni yechib olish</h3>
         <input type="number" id="cardInput" placeholder="8600 0000 0000 0000">
-        <button class="btn-withdraw" onclick="sendWithdrawRequest()">📩 Arizani Adminga Yuborish</button>
+        <button class="btn-withdraw" onclick="sendWithdrawRequest()">📩 Yechib olish arizasini yuborish</button>
     </div>
 </div>
 
 <script>
-    // Telegram WebApp obyektini ishga tushirish
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Oynani to'liq ekranga ochish
+    tg.expand();
 
-    // Server havolasi (Render.com ga yuklaganingizdan keyingi havola)
-    const SERVER_URL = "https://sizning-loyiha-nomingiz.onrender.com";
+    const SERVER_URL = "https://sizning-loyiha-nomingiz.onrender.com"; // O'zingizning Render havolangiz
 
     let joriyBalans = 0;
-    let oxirgiAylantirilganVaqt = localStorage.getItem("lastSpinTime") || null;
-    let userId = tg.initDataUnsafe?.user?.id || 1234567; // Test uchun default ID
-    let username = tg.initDataUnsafe?.user?.first_name || "Ismsiz";
+    let userId = tg.initDataUnsafe?.user?.id || 7777777; 
+    let username = tg.initDataUnsafe?.user?.first_name || "O'yinchi";
 
-    // O'yin boshlanganda serverdan foydalanuvchi balansini tekshirib olish
+    // Sahifa ochilganda bazadagi haqiqiy balansni tekshirish
     fetch(`${SERVER_URL}/get-user?id=${userId}`)
         .then(res => res.json())
         .then(data => {
@@ -122,52 +130,55 @@
                 joriyBalans = data.balance;
                 document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
             }
-        }).catch(err => console.log("Server ulanishda xato, lekin o'yin ishlayveradi."));
+        });
 
-    // 1. BARABANNI AYLANTIRISH MANTIQLARI
-    function barabanniAylantir() {
-        let bugun = new Date().toDateString(); // Masalan: "Mon Jun 15 2026"
-
-        if (oxirgiAylantirilganVaqt !== bugun) {
-            // Kunlik tekin imkoniyat bor!
-            omadniSinash("tekin", bugun);
-        } else {
-            // Tekin imkoniyat tugagan -> Premium taklif qilish
-            let rozimi = confirm("Bugungi tekin imkoniyatingiz tugadi. Hisobingizdan 5000 so'm evaziga Premium aylantirishni xohlaysizmi?");
-            if (rozimi) {
-                if (joriyBalans >= 5000) {
-                    omadniSinash("premium", bugun);
-                } else {
-                    alert("Hisobingizda mablag' yetarli emas! Premium uchun kamida 5000 so'm bo'lishi kerak.");
-                }
+    // PULLIK AYLANTIRISH MANTIQI
+    function barabanniAylantir(rejim) {
+        if (rejim === 'regular') {
+            if (joriyBalans >= 500) {
+                joriyBalans -= 500; // Balansdan srazu 500 so'm yechish
+                omadniSinash('regular');
+            } else {
+                alert("Hisobingizda mablag' yetarli emas! Kamida 500 so'm kerak. Do'stlarni taklif qilib pul ishlang.");
+            }
+        } 
+        else if (rejim === 'premium') {
+            if (joriyBalans >= 5000) {
+                joriyBalans -= 5000; // Balansdan srazu 5000 so'm yechish
+                omadniSinash('premium');
+            } else {
+                alert("Premium rejim uchun hisobingizda kamida 5000 so'm bo'lishi kerak!");
             }
         }
+        document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
     }
 
-    // Barabanni aylantirish va yutuq yozish
-    function omadniSinash(tur, bugun) {
+    // Barabanning aylanish vizual effekti va yutuqlar algoritmi
+    function omadniSinash(rejim) {
         let gildirak = document.getElementById("baraban_gildiragi");
-        let randomDeg = Math.floor(Math.random() * 360) + 1440; // Kamida 4 marta aylanish effekt
+        let randomDeg = Math.floor(Math.random() * 360) + 1800; // 5 marta to'liq aylanish
         gildirak.style.transform = `rotate(${randomDeg}deg)`;
 
-        // Baraban 3 soniya aylanadi, keyin yutuq hisoblanadi
         setTimeout(() => {
-            let yutuqlar = [0, 500, 1000, 2000, 5000, 10000];
-            let tasodifiyYutuq = yutuqlar[Math.floor(Math.random() * yutuqlar.length)];
-            
-            if (tur === "tekin") {
-                joriyBalans += tasodifiyYutuq;
-                oxirgiAylantirilganVaqt = bugun;
-                localStorage.setItem("lastSpinTime", bugun);
-                alert(`🎉 Tabriklaymiz! Tekin aylantirishdan ${tasodifiyYutuq} so'm yutdingiz!`);
-            } else if (tur === "premium") {
-                joriyBalans = (joriyBalans - 5000) + tasodifiyYutuq;
-                alert(`🔥 Premium aylantirish! 5000 so'm yechildi va siz ${tasodifiyYutuq} so'm yutdingiz!`);
+            let yutuq = 0;
+
+            if (rejim === 'regular') {
+                // 500 so'mlik rejim yutuqlari (Omadga qarab foyda yoki zarar)
+                let yutuqlarXonasi = [0, 100, 300, 500, 1000, 1500, 2500];
+                yutuq = yutuqlarXonasi[Math.floor(Math.random() * yutuqlarXonasi.length)];
+                alert(`🎰 Oddiy baraban! Sizga ${yutuq} so'm yutuq chiqdi!`);
+            } 
+            else if (rejim === 'premium') {
+                // 5000 so'mlik rejim yutuqlari (Katta pullar)
+                let premiumYutuqlar = [0, 1000, 3000, 5000, 7000, 15000, 30000];
+                yutuq = premiumYutuqlar[Math.floor(Math.random() * premiumYutuqlar.length)];
+                alert(`👑 Premium baraban! Sizga ${yutuq} so'm katta yutuq chiqdi!`);
             }
 
+            joriyBalans += yutuq; // Yutuqni balansga qo'shish
             document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
             
-            // Serverdagi bazaga yangi balansni yuborish
+            // Serverda ham balansni srazu xavfsiz yangilash
             balansniServerdaYangila(joriyBalans);
         }, 3000);
     }
@@ -180,21 +191,25 @@
         });
     }
 
-    // 2. REFERAL TIZIMI (DO'ST TAKLIF QILISH JS)
+    // REFERAL LINKI GENERATSIYASI
     function do'stniTaklifQilish() {
-        let botUsername = "SizningBarabanBot"; // O'zingizning botingiz usernamesini yozing
-        let text = "Do'stim, kuniga 1 marta tekin baraban aylantirib pul yutib ol! 🎁";
+        let botUsername = "SizningBarabanBot"; 
+        let text = "Do'stim, pullik barabanni aylantirib omadingni sina, haqiqiy pul yut! 🎁";
         let link = `https://t.me/${botUsername}?start=r_${userId}`;
         
         tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`);
     }
 
-    // 3. KARTA RAQAMINI ADMINGA YUBORISH
+    // ADMINGA KARTA RAQAMINI YUBORISH
     function sendWithdrawRequest() {
         let cardNum = document.getElementById("cardInput").value;
 
         if (cardNum.length < 16) {
-            alert("Karta raqami xato! Kamida 16 ta raqam kiritishingiz shart.");
+            alert("Karta raqami noto'g'ri! 16 ta raqam bo'lishi lozim.");
+            return;
+        }
+        if (joriyBalans <= 0) {
+            alert("Yechish uchun balansingizda pul yo'q!");
             return;
         }
 
@@ -206,9 +221,11 @@
         .then(res => res.json())
         .then(data => {
             if(data.success) {
-                alert("Arizangiz adminga muvaffaqiyatli yuborildi! Tez orada pul o'tkaziladi.");
+                alert("Arizangiz adminga jo'natildi! Hisobingiz arizadagi summaga yangilandi.");
+                joriyBalans = 0;
+                document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
             } else {
-                alert("Xatolik yuz berdi. Balansingizni tekshiring.");
+                alert("Xatolik: Ariza rad etildi.");
             }
         });
     }
