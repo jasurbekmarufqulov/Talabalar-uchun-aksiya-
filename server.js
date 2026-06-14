@@ -1,38 +1,44 @@
-// Barabanning aylanish vizual effekti va yangi yutuqlar algoritmi
-function omadniSinash(rejim) {
-    let gildirak = document.getElementById("baraban_gildiragi");
-    let randomDeg = Math.floor(Math.random() * 360) + 1800; // 5 marta to'liq aylanish effekti
-    gildirak.style.transform = `rotate(${randomDeg}deg)`;
 
-    // Baraban 3 soniya aylanadi, keyin yutuq hisoblanadi
-    setTimeout(() => {
-        let yutuq = 0;
 
-        if (rejim === 'regular') {
-            // 🎰 500 so'mlik rejim: 500 so'mdan 10 000 so'mgacha tasodifiy yutuqlar
-            // O'yin qiziq bo'lishi uchun 0 (yutqaziq) ham qo'shilgan
-            let yutuqlarXonasi = [0, 500, 1000, 2000, 3000, 5000, 10000];
-            yutuq = yutuqlarXonasi[Math.floor(Math.random() * yutuqlarXonasi.length)];
-            
-            if (yutuq > 0) {
-                alert(`🎰 Oddiy baraban! Omadingiz keldi, sizga ${yutuq} so'm yutuq chiqdi!`);
-            } else {
-                alert(`😢 Bu safar omadingiz kelmadi! Keyingi aylantirishda albatta omad kulib boqadi.`);
-            }
-        } 
-        else if (rejim === 'premium') {
-            // 👑 5000 so'mlik rejim: Bunda 500 so'm chiqish ehtimoli juda kam, 
-            // asosan eng yuqori yutuqlar (5000 va 10000) chiqish imkoniyati yuqori bo'ladi
-            let premiumYutuqlar = [500, 2000, 5000, 5000, 10000, 10000, 10000];
-            yutuq = premiumYutuqlar[Math.floor(Math.random() * premiumYutuqlar.length)];
-            alert(`👑 Premium baraban! Katta yutuqlar zonasi: sizga ${yutuq} so'm chiqdi!`);
+const TelegramBot = require('node-telegram-bot-api');
+const http = require('http');
+
+const token = '8689394977:AAFo5XmFsNPEQ--8QclWoQlB4ErXhRoFeJ8';
+const bot = new TelegramBot(token, {polling: true});
+const ADMIN_ID = '2002084215';
+
+http.createServer((req, res) => {
+    res.write("Bot marketing tizimi aktiv!");
+    res.end();
+}).listen(process.env.PORT || 3000);
+
+console.log("Aksiya bot tizimi ishga tushdi...");
+
+bot.onText(/\/start/, (msg) => {
+    bot.sendMessage(msg.chat.id, "👋 Salom! 'Omadli Talaba' rasmiy homiylik aksiyasiga xush kelibsiz!\n\nBu yerda siz har kuni mutlaqo bepul yoki kafolatlangan aksiyalar orqali bonuslar olishingiz mumkin. Boshlash uchun tugmani bosing: 👇", {
+        reply_markup: {
+            inline_keyboard: [[
+                { text: "🎁 Aksiya stendini ochish", web_app: { url: "https://jasurbekmarufqulov.github.io/Talabalar-uchun-aksiya-/" } }
+            ]]
         }
+    });
+});
 
-        // Yangi yutuqni joriy balansga qo'shish
-        joriyBalans += yutuq; 
-        document.getElementById("balans_matni").innerText = joriyBalans + " so'm";
+bot.on('web_app_data', (msg) => {
+    try {
+        const data = msg.web_app_data.data; 
+        const [prize, type, balance] = data.split('|');
+        const userName = msg.from.username ? `@${msg.from.username}` : "Noma'lum";
+        const userId = msg.from.id;
+
+        // O'yinchiga rag'batlantiruvchi xabar
+        bot.sendMessage(userId, `🎉 Muvaffaqiyatli! Homiylarimiz tomonidan sizga ${prize} aksiya bonusi taqdim etildi.\n💳 Sizning umumiy jamg'armangiz: ${balance} so'm.`);
+
+        // Adminga sof marketing hisoboti
+        const adminXabar = `📈 **Yangi Aksiya Hisoboti**\n\n👤 Foydalanuvchi: ${userName}\n🆔 ID: ${userId}\n📋 Ishtirok turi: ${type}\n💰 Ajratilgan bonus: ${prize}\n💳 Jami balansi: ${balance} so'm`;
+        bot.sendMessage(ADMIN_ID, adminXabar, { parse_mode: 'Markdown' });
         
-        // Serverdagi bazaga yangi balansni xavfsiz yuborish
-        balansniServerdaYangila(joriyBalans);
-    }, 3000); // 3 soniyadan keyin baraban to'xtaydi
-}
+    } catch (error) {
+        console.error("Xatolik yuz berdi:", error);
+    }
+});
